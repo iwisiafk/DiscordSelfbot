@@ -298,7 +298,21 @@ AVATAR URL            - {user.avatar_url}
 [{datetime.datetime.now()}]
 """)
     f.close()
-    await message.channel.send(file = discord.File(f'USER INFO - {user}.txt'))
+    await message.channel.send(
+f"""
+```
+USER INFO - {user}
+
+USER ID               - {user.id}
+ACCOUNT CREATION DATE - {user.created_at}
+BOT?                  - {user.bot}
+AVATAR URL            - {user.avatar_url}
+
+[{datetime.datetime.now()}]
+```
+""",
+    file = discord.File(f'USER INFO - {user}.txt')
+    )
     os.remove(f'USER INFO - {user}.txt')
     print(f"  {Color.GREEN}Logged {Color.WHITE}{user}{Color.GREEN}'s info successfully!")
     f.close()
