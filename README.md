@@ -26,6 +26,8 @@ Commands are as follows:
 > chanclear: Purges your messages in the command channel.
 > 
 > msgedit: Edits all you messages in a channel.
+>
+> userinfo: Gets the info of all users mentioned after the command and sends in chat as a text file.
 > 
 > spam: Spams a message in chat.Your token is how the bot will connect to your account. You'll have to paste it in the quotations.
 > 
