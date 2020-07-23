@@ -55,6 +55,8 @@ ______ _                       _   _   _ _   _ _
       await logout(message)
     if message.content.lower().startswith(f"{prefix}msgedit"):
       await msgedit(message)
+    if message.content.lower().startswith(f"{prefix}userinfo"):
+      await userinfo(message)
     if message.content.lower().startswith(f"{prefix}spam"):
       await spam(message)
     if message.content.lower().startswith(f"{prefix}gspam"):
@@ -113,21 +115,22 @@ async def logout(message):
 async def help(message):
   await message.delete()
   emHelp = discord.Embed(
-    title = "DiscordUtils - Help",
+    color = discord.Color.blurple(),
     description = f"""
-Made by Chaotic
-https://github.com/Chatic-Gaming/DiscordSelfbot
 **__CHAT COMMANDS__**
 ```
 {prefix}help
 Shows this message.
-
+ 
 {prefix}chanclear
 Purges your messages in the channel.
-
+ 
 {prefix}msgedit [edit-to]
 Edits all your messages to edit-to in the channel.
-
+ 
+{prefix}userinfo [users]
+Gets userinfo of mentioned users.
+ 
 {prefix}logout
 Logs the client out.
 ```
@@ -135,19 +138,21 @@ Logs the client out.
 ```
 {prefix}spam [message]
 Spams messages in the channel.
-
+ 
 {prefix}gspam [message]
 Spams ghost messages in the channel.
-
+ 
 {prefix}rspam*
 Ghost pings a list of all roles.
-
+ 
 {prefix}nuke*
 Nukes the server. You will be asked for confirmation in the console.
-
+ 
 *servers only
 ```
     """)
+  emHelp.set_author(name = "DiscordUtils - Help", icon_url = client.user.avatar_url, url = "https://github.com/Chatic-Gaming/DiscordSelfbot")
+  emHelp.set_footer(text = "Made by Chaotic || https://github.com/Chatic-Gaming/DiscordSelfbot")
   await message.channel.send(embed = emHelp, delete_after = 30)
 
 
@@ -274,6 +279,30 @@ async def msgedit(message):
         f"{Color.GREEN}Finished editing all messages to {Color.WHITE}{edit_to}"
     )
 
+
+async def userinfo(message):
+  await message.delete()
+  users = message.mentions
+  print(f"{Color.YELLOW}[{datetime.datetime.now()}]\n{Color.WHITE}Logging userinfo of {len(users)} users...")
+  for user in users:
+    print(f"  {Color.WHITE}Logging {user}...")
+    f = open(f"USER INFO - {user}.txt", 'w')
+    f.write(f"""
+USER INFO - {user}
+
+USER ID               - {user.id}
+ACCOUNT CREATION DATE - {user.created_at}
+BOT?                  - {user.bot}
+AVATAR URL            - {user.avatar_url}
+
+[{datetime.datetime.now()}]
+""")
+    f.close()
+    await message.channel.send(file = discord.File(f'USER INFO - {user}.txt'))
+    os.remove(f'USER INFO - {user}.txt')
+    print(f"  {Color.GREEN}Logged {Color.WHITE}{user}{Color.GREEN}'s info successfully!")
+    f.close()
+  print(f"{Color.GREEN}Finished logging userinfo!\n")
 
 
 client = MyClient()
