@@ -11,9 +11,11 @@ prefix = ""
 
 
 
+
 import discord
 import colorama
 from colorama import Fore as Color
+from colorama import Style
 import os
 import datetime
 import inputimeout
@@ -36,10 +38,12 @@ ______ _                       _   _   _ _   _ _
 {Color.LIGHTBLACK_EX}
                  Made by Chaotic
   https://github.com/Chatic-Gaming/DiscordSelfbot
-                  
 
-{Color.GREEN}Client has successfully logged in as {Color.WHITE}{client.user.name}#{client.user.discriminator}{Color.GREEN}!
-{Color.GREEN}Your discord ID is {Color.WHITE}{client.user.id}
+              {Color.WHITE}Discord Version {discord.__version__}
+
+{Color.GREEN}Client has successfully logged in as {Color.WHITE}{client.user.name}{Color.GREEN}!
+{Color.GREEN}Your account discrim is {Color.WHITE}{client.user.discriminator}{Color.GREEN}.
+{Color.GREEN}Your account ID is {Color.WHITE}{client.user.id}{Color.GREEN}.
 
 {Color.WHITE}Run {Color.YELLOW}'{prefix}help' {Color.WHITE}in any channel on discord to get started!
 """)
@@ -68,7 +72,9 @@ ______ _                       _   _   _ _   _ _
   
   async def on_message_delete(self, message):
     if message.author != client.user:
-      if isinstance(message.channel, discord.DMChannel):
+      if message.content == None:
+        return
+      elif isinstance(message.channel, discord.DMChannel):
         print(
           f"{Color.YELLOW}[{datetime.datetime.now()} UTC]{Color.WHITE}\n{message.author} deleted a message.\n{Color.GREEN}DM CHANNEL: {Color.WHITE}@{message.channel.recipient}\n{Color.GREEN}CONTENT:\n{Color.WHITE}{message.content}\n \n"
         )
@@ -97,15 +103,18 @@ ______ _                       _   _   _ _   _ _
                 print(
                     f"{Color.YELLOW}[{datetime.datetime.now()} UTC]{Color.WHITE}\n{before.author.name}#{before.author.discriminator} edited their message.\n{Color.GREEN}DM CHANNEL: {Color.WHITE}@{before.channel.recipient}\n{Color.GREEN}CURRENT CONTENT:\n{Color.WHITE}{after.content}\n{Color.GREEN}PREVIOUS CONTENT:\n{Color.WHITE}{before.content}\n \n"
                 )
-            if isinstance(before.channel, discord.GroupChannel):
+            elif isinstance(before.channel, discord.GroupChannel):
                 print(
                     f"{Color.YELLOW}[{datetime.datetime.now()} UTC]{Color.WHITE}\n{before.author.name}#{before.author.discriminator} edited their message.\n{Color.GREEN}GROUP CHANNEL: {Color.WHITE}{before.channel.name}\n{Color.GREEN}CURRENT CONTENT:\n{Color.WHITE}{after.content}\n{Color.GREEN}PREVIOUS CONTENT:\n{Color.WHITE}{before.content}\n \n"
                 )
-            if isinstance(before.channel, discord.TextChannel):
+            elif isinstance(before.channel, discord.TextChannel):
                 print(
                     f"{Color.YELLOW}[{datetime.datetime.now()} UTC]{Color.WHITE}\n{before.author.name}#{before.author.discriminator} edited their message.\n{Color.GREEN}GUILD: {Color.WHITE}{before.guild.name}\n{Color.GREEN}CHANNEL: {Color.WHITE}#{before.channel.name}\n{Color.GREEN}CURRENT CONTENT:\n{Color.WHITE}{after.content}\n{Color.GREEN}PREVIOUS CONTENT:\n{Color.WHITE}{before.content}\n \n"
                 )
     return
+
+
+
 
 async def logout(message):
   await message.delete()
@@ -153,7 +162,52 @@ Nukes the server. You will be asked for confirmation in the console.
     """)
   emHelp.set_author(name = "DiscordUtils - Help", icon_url = client.user.avatar_url, url = "https://github.com/Chatic-Gaming/DiscordSelfbot")
   emHelp.set_footer(text = "Made by Chaotic || https://github.com/Chatic-Gaming/DiscordSelfbot")
-  await message.channel.send(embed = emHelp, delete_after = 30)
+  try:
+    await message.channel.send(embed = emHelp, delete_after = 30)
+  except:
+    await message.channel.send(
+      """
+**__CHAT COMMANDS__**
+```
+{prefix}help
+Shows this message.
+ 
+{prefix}chanclear
+Purges your messages in the channel.
+ 
+{prefix}msgedit [edit-to]
+Edits all your messages to edit-to in the channel.
+ 
+{prefix}userinfo [users]
+Gets userinfo of mentioned users.
+ 
+{prefix}logout
+Logs the client out.
+```
+**__RAID COMMANDS__**
+```
+{prefix}spam [message]
+Spams messages in the channel.
+ 
+{prefix}gspam [message]
+Spams ghost messages in the channel.
+ 
+{prefix}rspam*
+Ghost pings a list of all roles.
+ 
+{prefix}nuke*
+Nukes the server. You will be asked for confirmation in the console.
+ 
+*servers only
+```
+**__CREDITS__**
+```
+Selfbot made by Chaotic.
+https://github.com/Chatic-Gaming/DiscordSelfbot
+```
+""",
+     delete_after = 30
+    )
 
 
 
@@ -180,15 +234,15 @@ async def nuke(message):
   if isinstance(message.channel, discord.DMChannel):
     print(f"{Color.RED}Nuke cancelled. {Color.WHITE}[Command was not sent in a server]\n")
     return
-  if isinstance(message.channel, discord.GroupChannel):
+  elif isinstance(message.channel, discord.GroupChannel):
     print(f"{Color.RED}Nuke cancelled. {Color.WHITE}[Command was not sent in a server]\n")
     return
   try:
-    confirmation = inputimeout(f"{Color.YELLOW}[{datetime.datetime.now()} UTC]\n{Color.WHITE}Are you sure you want to nuke {Color.YELLOW}{message.guild.name}{Color.WHITE}? Please type {Color.YELLOW}'Yes'{Color.WHITE} or {Color.YELLOW}'Cancel'{Color.WHITE} to continue.\nThis is case sensitive {Color.RED}and cannot be undone.{Color.WHITE}\nNuke will be cancelled in 30 seconds if no confirmation is given.\n \n>", timeout = 30)
-    if confirmation == "Cancel":
+    confirmation = inputimeout(f"{Color.YELLOW}[{datetime.datetime.now()} UTC]\n{Color.WHITE}Are you sure you want to nuke {Color.YELLOW}{message.guild.name}{Color.WHITE}? Please type {Color.YELLOW}'Yes'{Color.WHITE} or {Color.YELLOW}'Cancel'{Color.WHITE} to continue.\n{Color.RED}This cannot be undone.{Color.WHITE}\nNuke will be cancelled in 30 seconds if no confirmation is given.\n \n>", timeout = 30)
+    if confirmation.lower() == "cancel":
       print(f"\n{Color.GREEN}Nuke has been cancelled.\n")
       return
-    elif confirmation == "Yes":
+    elif confirmation.lower() == "yes":
       print(f"\n{Color.GREEN}Nuking {Color.WHITE}{message.guild.name}.\n")
       member = message.guild.get_member(client.user.id)
       perms = member.guild_permissions
@@ -197,6 +251,8 @@ async def nuke(message):
       else:
         print(f"\n{Color.RED}Nuke cancelled. {Color.WHITE}[Missing Permissions]\n")
         return
+    else:
+      print(f"\n{Color.RED}Nuke cancelled. {Color.WHITE}[Invalid Confimation]\n")
   except TimeoutOccurred:
     print(f"\n{Color.RED}Nuke cancelled. {Color.WHITE}[Time Expired]\n")
     return
@@ -247,7 +303,13 @@ async def gmspam(message):
   spammsg = "\n".join(role.mention for role in message.guild.roles)
   while True:
     try:
-      await message.channel.send(spammsg, delete_after = 0)
+      await message.channel.send(
+        f"""
+        @everyone
+        {spammsg}
+        """, 
+        delete_after = 0
+        )
     except discord.HTTPException:
       print(f"{Color.RED}Spam has been interrupted. {Color.WHITE}[Unknown Error]")
       return
@@ -300,6 +362,7 @@ AVATAR URL            - {user.avatar_url}
     f.close()
     await message.channel.send(
 f"""
+>>> 
 ```
 USER INFO - {user}
 
@@ -317,6 +380,7 @@ AVATAR URL            - {user.avatar_url}
     print(f"  {Color.GREEN}Logged {Color.WHITE}{user}{Color.GREEN}'s info successfully!")
     f.close()
   print(f"{Color.GREEN}Finished logging userinfo!\n")
+  
 
 
 client = MyClient()
