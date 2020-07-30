@@ -4,7 +4,7 @@
 token = ""
 
 #Type your prefix in the quotations, this will be placed in front of the chat commands.
-prefix = ""
+prefix = "?"
 
 #Enjoy! :)
 
